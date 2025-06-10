@@ -84,8 +84,8 @@ class MessageForwarder:
         task = self.active_tasks[chat_id]
         
         # فحص ساعات العمل
-        if not TimeHelper.is_working_hours(task['settings'].get('working_hours', {})):
-            return
+        # if not TimeHelper.is_working_hours(task['settings'].get('working_hours', {})):
+        #     return
         
         # فحص الفلاتر
         if not await self.filter_manager.check_message(message, task['settings'].get('filters', {})):
@@ -99,6 +99,7 @@ class MessageForwarder:
         forward_data = {
             'task': task,
             'message': message,
+            'context': context,  # أضف context
             'timestamp': datetime.now()
         }
         
@@ -117,37 +118,38 @@ class MessageForwarder:
         """معالجة طلب التوجيه"""
         task = forward_data['task']
         message = forward_data['message']
+        context = forward_data.get('context')  # أضف context للبيانات
         
         try:
             # تطبيق التأخير إذا كان محدداً
             delay = task['settings'].get('delay_seconds', 0)
             if delay > 0:
                 await asyncio.sleep(delay)
-            
+        
             # معالجة النص إذا كان نوع التوجيه "copy"
             processed_content = None
-            if task['forward_type'] == 'copy':
+            if task.get('forward_type') == 'copy':
                 processed_content = await self.process_message_content(message, task['settings'])
-            
+        
             # توجيه للأهداف
             successful_targets = []
             failed_targets = []
-            
+        
             for target_chat_id in task['target_chat_ids']:
                 try:
-                    if task['forward_type'] == 'forward':
+                    if task.get('forward_type') == 'forward':
                         forwarded_msg = await self.forward_message(message, target_chat_id, task, context)
                     else:
                         forwarded_msg = await self.copy_message(message, target_chat_id, task, context, processed_content)
-                    
+                
                     if forwarded_msg:
                         successful_targets.append({
                             'chat_id': target_chat_id,
                             'message_id': forwarded_msg.message_id
                         })
-                        
+                    
                         # تثبيت الرسالة إذا كان مطلوباً
-                        if task['settings'].get('advanced', {}).get('pin_messages', False):
+                        if task['settings'].get('advanced', {}).get('pin_messages', False) and context:
                             try:
                                 await context.bot.pin_chat_message(
                                     chat_id=target_chat_id,
@@ -156,7 +158,7 @@ class MessageForwarder:
                                 )
                             except Exception:
                                 pass  # تجاهل أخطاء التثبيت
-                    
+                
                 except Exception as e:
                     failed_targets.append({
                         'chat_id': target_chat_id,
@@ -167,10 +169,10 @@ class MessageForwarder:
                         'target_chat_id': target_chat_id,
                         'message_id': message.message_id
                     })
-            
+        
             # تسجيل النتائج
             await self.log_forwarding_results(task, message, successful_targets, failed_targets)
-            
+        
         except Exception as e:
             logger.log_error(e, {
                 'task_id': task['id'],

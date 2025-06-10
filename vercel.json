@@ -1,0 +1,32 @@
+{
+  "version": 2,
+  "name": "telegram-bot",
+  "builds": [
+    {
+      "src": "api/*.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/webhook",
+      "dest": "/api/webhook.py"
+    },
+    {
+      "src": "/api/setup",
+      "dest": "/api/setup.py"
+    },
+    {
+      "src": "/",
+      "dest": "/api/index.py"
+    }
+  ],
+  "functions": {
+    "api/*.py": {
+      "runtime": "python3.9"
+    }
+  },
+  "env": {
+    "PYTHON_VERSION": "3.9"
+  }
+}

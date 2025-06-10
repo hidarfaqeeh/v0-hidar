@@ -248,6 +248,19 @@ class DatabaseManager:
         result = self.execute_query(query, (user_id,))
         return len(result) > 0
     
+    async def get_admin_user_ids(self) -> List[int]:
+        """الحصول على معرفات المشرفين"""
+        query = "SELECT user_id FROM admins"
+        results = self.execute_query(query)
+        return [row['user_id'] for row in results]
+
+    async def get_developer_user_ids(self) -> List[int]:
+        """الحصول على معرفات المطورين"""
+        # يمكن إضافة جدول منفصل للمطورين أو استخدام permissions
+        query = "SELECT user_id FROM admins WHERE permissions LIKE '%developer%'"
+        results = self.execute_query(query)
+        return [row['user_id'] for row in results]
+    
     # الرسائل المجدولة
     async def add_scheduled_message(self, user_id: int, message_text: str, 
                                    target_type: str, target_ids: List[int],

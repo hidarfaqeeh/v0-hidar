@@ -1,0 +1,16 @@
+{
+  "name": "telegram-bot-vercel",
+  "version": "1.0.0",
+  "description": "Telegram Bot deployed on Vercel",
+  "main": "api/index.py",
+  "scripts": {
+    "dev": "python -m http.server 3000",
+    "build": "echo 'Build completed'",
+    "start": "echo 'Starting bot'"
+  },
+  "keywords": ["telegram", "bot", "python", "vercel"],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {}
+}
