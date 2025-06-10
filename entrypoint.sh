@@ -43,6 +43,12 @@ fi
 
 echo "[$(date -Iseconds)] ✅ تم التحقق من متغيرات البيئة بنجاح"
 
+# إنشاء تهيئة Alembic إذا لم يكن المجلد موجوداً
+if [ -f "alembic.ini" ] && [ ! -d "alembic" ]; then
+    echo "[$(date -Iseconds)] alembic غير مهيأ. يتم الإنشاء الآن ..."
+    alembic init alembic
+fi
+
 # تنفيذ أي ترقيات لقاعدة البيانات إذا لزم الأمر
 if [ -f "alembic.ini" ]; then
     echo "تطبيق ترقيات قاعدة البيانات..."
