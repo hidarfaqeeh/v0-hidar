@@ -1,14 +1,16 @@
 #!/bin/bash
 set -e
 
+echo "[$(date -Iseconds)] بدء تشغيل البوت..."
+
 # إنشاء ملف البيئة إذا لم يكن موجودًا
 if [ ! -f .env ]; then
-    echo "إنشاء ملف .env افتراضي..."
+    echo "[$(date -Iseconds)] إنشاء ملف .env افتراضي..."
     touch .env
     
     # إضافة متغيرات البيئة الافتراضية إذا لم تكن موجودة
     if [ -z "$BOT_TOKEN" ]; then
-        echo "⚠️ تحذير: لم يتم تعيين BOT_TOKEN. يرجى تعيينه قبل تشغيل البوت."
+        echo "[$(date -Iseconds)] ⚠️ تحذير: لم يتم تعيين BOT_TOKEN. يرجى تعيينه قبل تشغيل البوت."
     else
         echo "BOT_TOKEN=$BOT_TOKEN" >> .env
     fi
@@ -29,7 +31,17 @@ if [ ! -f .env ]; then
 fi
 
 # إنشاء الدلائل اللازمة إذا لم تكن موجودة
-mkdir -p data logs
+echo "[$(date -Iseconds)] إنشاء الدلائل اللازمة..."
+mkdir -p data logs backups
+
+# التحقق من وجود BOT_TOKEN
+if [ -z "$BOT_TOKEN" ]; then
+    echo "[$(date -Iseconds)] ❌ خطأ: BOT_TOKEN غير محدد!"
+    echo "[$(date -Iseconds)] يرجى تعيين BOT_TOKEN في متغيرات البيئة"
+    exit 1
+fi
+
+echo "[$(date -Iseconds)] ✅ تم التحقق من متغيرات البيئة بنجاح"
 
 # تنفيذ أي ترقيات لقاعدة البيانات إذا لزم الأمر
 if [ -f "alembic.ini" ]; then
@@ -38,4 +50,5 @@ if [ -f "alembic.ini" ]; then
 fi
 
 # تنفيذ الأمر المحدد
+echo "[$(date -Iseconds)] تشغيل البوت..."
 exec "$@"
