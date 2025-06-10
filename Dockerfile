@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 # نسخ ملف المتطلبات أولاً
-COPY requirements.simple.txt requirements.txt
+COPY requirements.txt requirements.txt
 
 # تثبيت متطلبات Python
 RUN pip install --no-cache-dir --upgrade pip && \
